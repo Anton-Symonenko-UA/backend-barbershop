@@ -1,0 +1,153 @@
+// Схема бази даних барбершопу.
+// Після змін: npm run db:migrate (з кореня репозиторію).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  BARBER
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
+
+// Персонал з доступом до адмінки
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(BARBER)
+  barber       Barber?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Barber {
+  id           String         @id @default(cuid())
+  slug         String         @unique
+  name         String
+  title        String?        // напр. "Top barber"
+  bio          String?
+  photoUrl     String?
+  instagram    String?
+  isActive     Boolean        @default(true)
+  sortOrder    Int            @default(0)
+  userId       String?        @unique
+  user         User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+  services     BarberService[]
+  workingHours WorkingHours[]
+  timeOff      TimeOff[]
+  bookings     Booking[]
+  reviews      Review[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model ServiceCategory {
+  id        String    @id @default(cuid())
+  name      String
+  sortOrder Int       @default(0)
+  services  Service[]
+}
+
+model Service {
+  id          String          @id @default(cuid())
+  slug        String          @unique
+  name        String
+  description String?
+  durationMin Int
+  priceCents  Int             // гроші зберігаємо в копійках, без float
+  isActive    Boolean         @default(true)
+  sortOrder   Int             @default(0)
+  categoryId  String?
+  category    ServiceCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  barbers     BarberService[]
+  bookings    Booking[]
+}
+
+// Який майстер робить яку послугу (і за яку ціну, якщо відрізняється)
+model BarberService {
+  barberId    String
+  serviceId   String
+  priceCents  Int?
+  durationMin Int?
+  barber      Barber  @relation(fields: [barberId], references: [id], onDelete: Cascade)
+  service     Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@id([barberId, serviceId])
+}
+
+// Графік: день тижня 0 (неділя) – 6, час у хвилинах від півночі
+model WorkingHours {
+  id        String @id @default(cuid())
+  barberId  String
+  weekday   Int
+  startMin  Int
+  endMin    Int
+  barber    Barber @relation(fields: [barberId], references: [id], onDelete: Cascade)
+
+  @@unique([barberId, weekday])
+}
+
+model TimeOff {
+  id       String   @id @default(cuid())
+  barberId String
+  startsAt DateTime
+  endsAt   DateTime
+  reason   String?
+  barber   Barber   @relation(fields: [barberId], references: [id], onDelete: Cascade)
+
+  @@index([barberId, startsAt])
+}
+
+model Customer {
+  id        String    @id @default(cuid())
+  name      String
+  phone     String    @unique
+  email     String?
+  bookings  Booking[]
+  createdAt DateTime  @default(now())
+}
+
+model Booking {
+  id          String        @id @default(cuid())
+  barberId    String
+  serviceId   String
+  customerId  String
+  startsAt    DateTime
+  endsAt      DateTime
+  status      BookingStatus @default(PENDING)
+  priceCents  Int           // ціна, зафіксована на момент запису
+  comment     String?
+  barber      Barber        @relation(fields: [barberId], references: [id])
+  service     Service       @relation(fields: [serviceId], references: [id])
+  customer    Customer      @relation(fields: [customerId], references: [id])
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([barberId, startsAt])
+  @@index([customerId])
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  barberId    String?
+  authorName  String
+  rating      Int
+  text        String
+  isPublished Boolean  @default(false)
+  barber      Barber?  @relation(fields: [barberId], references: [id], onDelete: SetNull)
+  createdAt   DateTime @default(now())
+}

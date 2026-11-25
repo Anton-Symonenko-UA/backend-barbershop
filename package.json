@@ -1,0 +1,30 @@
+{
+  "name": "barbershop",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n web,api -c magenta,cyan \"npm run dev -w web -- -p 3000\" \"PORT=4000 npm run start:dev -w api\"",
+    "dev:web": "npm run dev -w web",
+    "dev:api": "PORT=4000 npm run start:dev -w api",
+    "build": "npm run build -w @barbershop/shared && npm run build -w api && npm run build -w web",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "format": "prettier --write .",
+    "db:migrate": "npm run db:migrate -w api",
+    "db:studio": "npm run db:studio -w api",
+    "db:seed": "npm run db:seed -w api",
+    "db:start": "npm run db:start -w api",
+    "db:stop": "npm run db:stop -w api"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.7",
+    "prettier": "^3.10.1",
+    "prettier-plugin-tailwindcss": "^0.8.1"
+  }
+}

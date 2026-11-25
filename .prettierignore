@@ -1,0 +1,8 @@
+node_modules
+dist
+.next
+coverage
+package-lock.json
+.claude
+skills-lock.json
+apps/api/src/generated
