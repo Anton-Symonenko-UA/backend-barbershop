@@ -76,6 +76,7 @@ export interface ReviewsSummary {
 
 export interface AuthToken {
   accessToken: string;
+  /** Секунди до закінчення дії токена */
   expiresIn: number;
 }
 

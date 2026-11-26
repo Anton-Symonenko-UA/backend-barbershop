@@ -12,15 +12,13 @@ function setup(
 ) {
   const prisma = {
     booking: {
-      findMany: vi
-        .fn()
-        .mockResolvedValue(
-          rows.map((r) => ({
-            ...r,
-            barber: { name: 'Денис' },
-            customer: { phone: '+380670000000' },
-          })),
-        ),
+      findMany: vi.fn().mockResolvedValue(
+        rows.map((r) => ({
+          ...r,
+          barber: { name: 'Денис' },
+          customer: { phone: '+380670000000' },
+        })),
+      ),
       updateMany: vi.fn().mockResolvedValue({ count: claimed }),
       update: vi.fn().mockResolvedValue({}),
     },

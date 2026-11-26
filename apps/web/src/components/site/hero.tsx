@@ -3,6 +3,7 @@
 import { ArrowDownIcon } from 'lucide-react';
 import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRef } from 'react';
 import { cn } from 'cn';
 import { buttonVariants } from '@/components/ui/button';
@@ -83,12 +84,12 @@ export function Hero() {
             Стрижка, після якої хочеться дивитись у дзеркало.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <a
-              href="#booking"
+            <Link
+              href="/booking"
               className={cn(buttonVariants(), 'h-12 rounded-full px-7 text-sm font-semibold')}
             >
               Записатися онлайн
-            </a>
+            </Link>
             <a
               href="#services"
               className={cn(

@@ -1,7 +1,10 @@
 import { ArrowUpRightIcon } from 'lucide-react';
+import Link from 'next/link';
 import { nav, site } from '@/config/site';
+import { getServices } from '@/lib/data';
 
-export function Footer() {
+export async function Footer() {
+  const services = await getServices();
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${site.geo.lat},${site.geo.lng}`;
 
   return (
@@ -10,7 +13,7 @@ export function Footer() {
       aria-labelledby="contacts-title"
       className="overflow-hidden pt-24 sm:pt-32"
     >
-      <div className="mx-auto grid max-w-[1440px] gap-12 px-4 sm:px-8 md:grid-cols-2 lg:grid-cols-4">
+      <div className="mx-auto grid max-w-[1440px] gap-12 px-4 sm:px-8 md:grid-cols-2 lg:grid-cols-5">
         <div className="lg:col-span-2">
           <h2 id="contacts-title" className="eyebrow text-primary">
             Контакти
@@ -59,6 +62,19 @@ export function Footer() {
             </li>
           </ul>
         </div>
+
+        <nav aria-label="Послуги">
+          <p className="eyebrow text-muted-foreground">Послуги</p>
+          <ul className="mt-5 grid gap-2">
+            {services.slice(0, 6).map((s) => (
+              <li key={s.id}>
+                <Link href={`/services/${s.slug}`} className="hover:text-primary">
+                  {s.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
         <nav aria-label="Навігація в підвалі">
           <p className="eyebrow text-muted-foreground">Розділи</p>

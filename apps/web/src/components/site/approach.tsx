@@ -28,13 +28,13 @@ function Panel({ step, className }: { step: Step; className?: string }) {
       )}
     >
       <header className="flex items-start justify-between gap-6">
-        <div>
+        <div className="min-w-0">
           <p className="eyebrow text-[var(--panel-muted)]">{step.n}</p>
-          <h3 className="font-heading mt-3 text-[clamp(2.25rem,4.6vw,4.5rem)] leading-none font-black uppercase">
+          <h3 className="font-heading mt-3 text-[clamp(2rem,4.6vw,4.5rem)] leading-none font-black uppercase">
             {step.title}
           </h3>
         </div>
-        <Drawing className="w-28 shrink-0 text-[var(--panel-muted)] sm:w-36 lg:w-[min(14vw,200px)]" />
+        <Drawing className="w-20 shrink-0 text-[var(--panel-muted)] sm:w-36 lg:w-[min(14vw,200px)]" />
       </header>
 
       <div className="grid gap-8 sm:grid-cols-[1.2fr_1fr] sm:items-end">

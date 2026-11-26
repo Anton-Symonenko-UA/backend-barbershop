@@ -1,3 +1,5 @@
+import type { PublicService } from '@barbershop/shared';
+
 // Увесь контент головної сторінки в одному місці.
 // Назву, контакти й адресу заміни на справжні перед запуском.
 
@@ -21,14 +23,26 @@ export const site = {
     { days: 'Сб–Нд', time: '10:00–20:00' },
   ],
   geo: { lat: 50.4633, lng: 30.5194 },
+  // Колір інтерфейсу браузера: збігається з токеном --background (oklch(0.155 0.006 60)).
+  // Meta theme-color не читає CSS-змінні, тому значення продубльоване тут, а не в компонентах.
+  themeColor: 'oklch(0.155 0.006 60)',
+} as const;
+
+// Кольори для згенерованої OG-картинки: генератор не читає CSS-змінні й не знає oklch,
+// тому тут sRGB-еквіваленти токенів --background, --foreground і --primary.
+export const ogColors = {
+  background: 'rgb(22, 19, 17)',
+  foreground: 'rgb(239, 234, 224)',
+  primary: 'rgb(212, 180, 125)',
 } as const;
 
 export const nav = [
-  { href: '#space', label: 'Простір' },
-  { href: '#approach', label: 'Підхід' },
-  { href: '#services', label: 'Послуги' },
-  { href: '#team', label: 'Майстри' },
-  { href: '#contacts', label: 'Контакти' },
+  { href: '/#space', label: 'Простір' },
+  { href: '/#approach', label: 'Підхід' },
+  { href: '/#services', label: 'Послуги' },
+  { href: '/#team', label: 'Майстри' },
+  { href: '/reviews', label: 'Відгуки' },
+  { href: '/#contacts', label: 'Контакти' },
 ] as const;
 
 export const images = {
@@ -138,6 +152,7 @@ export const approach = [
 
 export const team = [
   {
+    slug: 'oleh-marchenko',
     name: 'Олег Марченко',
     role: 'Арт-директор',
     years: 12,
@@ -146,6 +161,7 @@ export const team = [
     alt: 'Майстер працює з клієнтом у кріслі',
   },
   {
+    slug: 'denys-koval',
     name: 'Денис Коваль',
     role: 'Топ-барбер',
     years: 8,
@@ -154,6 +170,7 @@ export const team = [
     alt: 'Барбер підрівнює волосся клієнту машинкою',
   },
   {
+    slug: 'artem-lysenko',
     name: 'Артем Лисенко',
     role: 'Барбер',
     years: 7,
@@ -164,7 +181,7 @@ export const team = [
 ] as const;
 
 // Запасний прайс: показується, якщо API недоступне
-export const fallbackServices = [
+export const fallbackServices: PublicService[] = [
   {
     id: 'haircut',
     slug: 'haircut',

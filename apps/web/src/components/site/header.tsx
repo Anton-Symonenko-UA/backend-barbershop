@@ -1,6 +1,7 @@
 'use client';
 
 import { MenuIcon } from 'lucide-react';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { cn } from 'cn';
 import { buttonVariants } from '@/components/ui/button';
@@ -34,13 +35,13 @@ export function Header() {
       )}
     >
       <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-6 px-4 sm:px-8">
-        <a
-          href="#top"
+        <Link
+          href="/"
           className="font-heading focus-visible:outline-ring text-lg font-bold tracking-[0.18em] focus-visible:outline-2 focus-visible:outline-offset-4"
-          aria-label={`${site.name}, на початок сторінки`}
+          aria-label={`${site.name}, на головну`}
         >
           {site.name}
-        </a>
+        </Link>
 
         <nav aria-label="Основна навігація" className="hidden lg:block">
           <ul className="flex items-center gap-8">
@@ -64,12 +65,12 @@ export function Header() {
           >
             {site.phone}
           </a>
-          <a
-            href="#booking"
+          <Link
+            href="/booking"
             className={cn(buttonVariants(), 'h-10 rounded-full px-5 text-[0.8rem] font-semibold')}
           >
             Записатися
-          </a>
+          </Link>
 
           <Sheet>
             <SheetTrigger

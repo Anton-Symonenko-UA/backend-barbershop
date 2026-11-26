@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from 'next';
 import { Manrope, Unbounded } from 'next/font/google';
 import { Providers } from '@/components/providers/providers';
+import { Analytics } from '@/components/providers/analytics';
 import { site } from '@/config/site';
+import { SITE_URL } from '@/lib/config';
 import './globals.css';
 
 // Обидва шрифти мають кирилицю
@@ -12,17 +14,18 @@ const heading = Unbounded({
   display: 'swap',
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
-
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(SITE_URL),
   title: { default: `${site.name} — барбершоп у Києві`, template: `%s · ${site.name}` },
   description: site.description,
+  alternates: { canonical: '/' },
   openGraph: { type: 'website', locale: 'uk_UA', siteName: site.name },
+  twitter: { card: 'summary_large_image' },
+  formatDetection: { telephone: false },
 };
 
 export const viewport: Viewport = {
-  themeColor: [{ color: '#14110f' }],
+  themeColor: [{ color: site.themeColor }],
 };
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
@@ -34,6 +37,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
     >
       <body className="flex min-h-full flex-col">
         <Providers>{children}</Providers>
+        <Analytics />
       </body>
     </html>
   );

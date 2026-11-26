@@ -1,4 +1,5 @@
-import { PhoneIcon, SendIcon } from 'lucide-react';
+import { ArrowRightIcon, PhoneIcon, SendIcon } from 'lucide-react';
+import Link from 'next/link';
 import { cn } from 'cn';
 import { buttonVariants } from '@/components/ui/button';
 import { Reveal } from '@/components/site/reveal';
@@ -28,20 +29,30 @@ export function Booking() {
         <div className="border-tan-foreground/25 mt-16 grid gap-10 border-t pt-10 lg:grid-cols-12">
           <Reveal className="lg:col-span-5">
             <p className="max-w-md text-lg text-pretty">
-              Онлайн-запис з вибором майстра і часу з’явиться тут найближчим часом. Поки що
-              запишіться дзвінком або в Telegram, відповідаємо протягом 10 хвилин.
+              Оберіть послугу, майстра і вільний час онлайн: це займає хвилину. Зручніше голосом?
+              Телефонуйте або пишіть у Telegram, відповідаємо протягом 10 хвилин.
             </p>
           </Reveal>
-          <Reveal delay={0.1} className="flex flex-wrap gap-3 lg:col-span-4">
+          <Reveal delay={0.1} className="flex flex-wrap content-start gap-3 lg:col-span-4">
+            <Link
+              href="/booking"
+              className={cn(
+                buttonVariants(),
+                'bg-tan-foreground text-tan hover:bg-tan-foreground/85 h-14 w-full rounded-full px-7 text-base font-semibold sm:w-auto',
+              )}
+            >
+              Обрати час онлайн
+              <ArrowRightIcon aria-hidden className="size-4" />
+            </Link>
             <a
               href={site.phoneHref}
               className={cn(
-                buttonVariants(),
-                'bg-tan-foreground text-tan hover:bg-tan-foreground/85 h-14 rounded-full px-7 text-base font-semibold',
+                buttonVariants({ variant: 'outline' }),
+                'border-tan-foreground/40 text-tan-foreground hover:bg-tan-foreground/10 dark:border-tan-foreground/40 dark:hover:bg-tan-foreground/10 h-14 rounded-full bg-transparent px-7 text-base dark:bg-transparent',
               )}
             >
               <PhoneIcon aria-hidden className="size-4" />
-              {site.phone}
+              <span className="tabular-nums">{site.phone}</span>
             </a>
             <a
               href={site.telegram}

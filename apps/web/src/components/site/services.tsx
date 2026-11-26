@@ -1,6 +1,9 @@
 import { ArrowUpRightIcon } from 'lucide-react';
 import { Reveal } from '@/components/site/reveal';
-import { formatPrice, getServices, groupByCategory } from '@/lib/services';
+import Link from 'next/link';
+import { getServices } from '@/lib/data';
+import { formatPrice } from '@/lib/format';
+import { groupByCategory } from '@/lib/group';
 
 // Прайс на «холодному папері», як світлі аркуші в референсі
 export async function Services() {
@@ -41,8 +44,9 @@ export async function Services() {
               <ul>
                 {items.map((s) => (
                   <li key={s.id} className="border-paper-foreground/15 border-b">
-                    <a
-                      href={`#booking`}
+                    <Link
+                      href={`/booking?service=${s.slug}`}
+                      aria-label={`${s.name}, ${formatPrice(s.priceCents)}, ${s.durationMin} хвилин. Записатися`}
                       className="group focus-visible:bg-paper-foreground/5 grid grid-cols-[1fr_auto] gap-x-4 gap-y-1 py-5 outline-none"
                     >
                       <span className="font-heading text-lg leading-snug font-semibold">
@@ -63,7 +67,7 @@ export async function Services() {
                           className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                         />
                       </span>
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
