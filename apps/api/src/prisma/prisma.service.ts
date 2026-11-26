@@ -10,6 +10,9 @@ export class PrismaService extends PrismaClient implements OnModuleDestroy {
     super({
       adapter: new PrismaPg({
         connectionString: config.get('DATABASE_URL', { infer: true }),
+        // Локальний `prisma dev` (PGlite) обслуговує лише одне з'єднання за раз:
+        // з більшим пулом паралельні запити плутають відповіді. Там DATABASE_POOL_MAX=1.
+        max: config.get('DATABASE_POOL_MAX', { infer: true }),
       }),
     });
   }

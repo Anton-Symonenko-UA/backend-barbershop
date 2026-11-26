@@ -35,24 +35,26 @@ model User {
 }
 
 model Barber {
-  id           String         @id @default(cuid())
-  slug         String         @unique
-  name         String
-  title        String?        // напр. "Top barber"
-  bio          String?
-  photoUrl     String?
-  instagram    String?
-  isActive     Boolean        @default(true)
-  sortOrder    Int            @default(0)
-  userId       String?        @unique
-  user         User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
-  services     BarberService[]
-  workingHours WorkingHours[]
-  timeOff      TimeOff[]
-  bookings     Booking[]
-  reviews      Review[]
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
+  id              String          @id @default(cuid())
+  slug            String          @unique
+  name            String
+  title           String? // напр. "Top barber"
+  bio             String?
+  specialty       String?
+  experienceSince Int? // рік початку практики, щоб "років досвіду" не застарівало
+  photoUrl        String?
+  instagram       String?
+  isActive        Boolean         @default(true)
+  sortOrder       Int             @default(0)
+  userId          String?         @unique
+  user            User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  services        BarberService[]
+  workingHours    WorkingHours[]
+  timeOff         TimeOff[]
+  bookings        Booking[]
+  reviews         Review[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
 }
 
 model ServiceCategory {
@@ -63,14 +65,14 @@ model ServiceCategory {
 }
 
 model Service {
-  id          String          @id @default(cuid())
-  slug        String          @unique
+  id          String           @id @default(cuid())
+  slug        String           @unique
   name        String
   description String?
   durationMin Int
-  priceCents  Int             // гроші зберігаємо в копійках, без float
-  isActive    Boolean         @default(true)
-  sortOrder   Int             @default(0)
+  priceCents  Int // гроші зберігаємо в копійках, без float
+  isActive    Boolean          @default(true)
+  sortOrder   Int              @default(0)
   categoryId  String?
   category    ServiceCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   barbers     BarberService[]
@@ -91,12 +93,12 @@ model BarberService {
 
 // Графік: день тижня 0 (неділя) – 6, час у хвилинах від півночі
 model WorkingHours {
-  id        String @id @default(cuid())
-  barberId  String
-  weekday   Int
-  startMin  Int
-  endMin    Int
-  barber    Barber @relation(fields: [barberId], references: [id], onDelete: Cascade)
+  id       String @id @default(cuid())
+  barberId String
+  weekday  Int
+  startMin Int
+  endMin   Int
+  barber   Barber @relation(fields: [barberId], references: [id], onDelete: Cascade)
 
   @@unique([barberId, weekday])
 }
@@ -122,23 +124,29 @@ model Customer {
 }
 
 model Booking {
-  id          String        @id @default(cuid())
-  barberId    String
-  serviceId   String
-  customerId  String
-  startsAt    DateTime
-  endsAt      DateTime
-  status      BookingStatus @default(PENDING)
-  priceCents  Int           // ціна, зафіксована на момент запису
-  comment     String?
-  barber      Barber        @relation(fields: [barberId], references: [id])
-  service     Service       @relation(fields: [serviceId], references: [id])
-  customer    Customer      @relation(fields: [customerId], references: [id])
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  id              String        @id @default(cuid())
+  barberId        String
+  serviceId       String
+  customerId      String
+  startsAt        DateTime
+  endsAt          DateTime
+  status          BookingStatus @default(PENDING)
+  priceCents      Int // ціна, зафіксована на момент запису
+  comment         String?
+  // SHA-256 від секретного токена з посилання "керувати записом"; сам токен не зберігаємо
+  manageTokenHash String        @unique
+  reminderSentAt  DateTime?
+  barber          Barber        @relation(fields: [barberId], references: [id])
+  service         Service       @relation(fields: [serviceId], references: [id])
+  customer        Customer      @relation(fields: [customerId], references: [id])
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  // Плюс exclusion constraint "Booking_no_overlap" у міграції (Prisma не описує їх у схемі):
+  // активні записи одного майстра не можуть перетинатися в часі.
 
   @@index([barberId, startsAt])
   @@index([customerId])
+  @@index([status, startsAt])
 }
 
 model Review {
