@@ -1,0 +1,56 @@
+# Повний стек локально або на VPS: docker compose up --build
+# Потрібен .env поруч із цим файлом з AUTH_SECRET (openssl rand -base64 32) і POSTGRES_PASSWORD.
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: barbershop
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: barbershop
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U barbershop']
+      interval: 5s
+      retries: 10
+
+  # Міграції окремим кроком: стадія build, де є Prisma CLI
+  migrate:
+    build: { context: ., dockerfile: apps/api/Dockerfile, target: build }
+    working_dir: /app/apps/api
+    command: ['npx', 'prisma', 'migrate', 'deploy']
+    environment:
+      DATABASE_URL: postgresql://barbershop:${POSTGRES_PASSWORD}@db:5432/barbershop
+    depends_on:
+      db: { condition: service_healthy }
+
+  api:
+    build: { context: ., dockerfile: apps/api/Dockerfile }
+    environment:
+      DATABASE_URL: postgresql://barbershop:${POSTGRES_PASSWORD}@db:5432/barbershop
+      AUTH_SECRET: ${AUTH_SECRET:?set AUTH_SECRET in .env}
+      WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost:3000}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_ADMIN_CHAT_ID: ${TELEGRAM_ADMIN_CHAT_ID:-}
+      TURBOSMS_TOKEN: ${TURBOSMS_TOKEN:-}
+      TRUST_PROXY: ${TRUST_PROXY:-0}
+    ports: ['4000:4000']
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${PUBLIC_API_URL:-http://localhost:4000/api}
+        NEXT_PUBLIC_SITE_URL: ${WEB_ORIGIN:-http://localhost:3000}
+        NEXT_PUBLIC_GA_ID: ${NEXT_PUBLIC_GA_ID:-}
+    environment:
+      # Сервер Next ходить до API всередині мережі compose
+      API_URL: http://api:4000/api
+    ports: ['3000:3000']
+    depends_on: [api]
+
+volumes:
+  pgdata:

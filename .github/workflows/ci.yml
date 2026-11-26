@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Lint, test, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: barbershop
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/barbershop
+      DATABASE_POOL_MAX: '10'
+      # Лише для CI: справжній секрет живе в .env і в налаштуваннях хостингу
+      AUTH_SECRET: ci-only-secret-that-is-at-least-32-bytes-long
+      NEXT_TELEMETRY_DISABLED: '1'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build shared package
+        run: npm run build -w @barbershop/shared
+
+      - name: Apply migrations
+        run: npx prisma migrate deploy
+        working-directory: apps/api
+
+      - run: npm run lint
+
+      - name: Unit tests
+        run: npm test
+
+      # На справжньому Postgres: тут паралельні запити йдуть різними з'єднаннями,
+      # тож тест подвійного запису перевіряє exclusion constraint по-справжньому
+      - name: API e2e tests
+        run: npm run test:e2e -w api
+
+      - run: npm run build
