@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from 'next';
-import { Manrope, Playfair_Display } from 'next/font/google';
+import { Manrope, Unbounded } from 'next/font/google';
 import { Providers } from '@/components/providers/providers';
+import { site } from '@/config/site';
 import './globals.css';
 
 // Обидва шрифти мають кирилицю
 const sans = Manrope({ variable: '--font-sans', subsets: ['latin', 'cyrillic'], display: 'swap' });
-const heading = Playfair_Display({
+const heading = Unbounded({
   variable: '--font-heading-family',
   subsets: ['latin', 'cyrillic'],
   display: 'swap',
@@ -15,16 +16,13 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: { default: 'Барбершоп', template: '%s · Барбершоп' },
-  description: 'Чоловічі стрижки, бороди та догляд. Онлайн-запис до майстра.',
-  openGraph: { type: 'website', locale: 'uk_UA', siteName: 'Барбершоп' },
+  title: { default: `${site.name} — барбершоп у Києві`, template: `%s · ${site.name}` },
+  description: site.description,
+  openGraph: { type: 'website', locale: 'uk_UA', siteName: site.name },
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#0a0a0a' },
-  ],
+  themeColor: [{ color: '#14110f' }],
 };
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
@@ -32,7 +30,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
     <html
       lang="uk"
       suppressHydrationWarning
-      className={`${sans.variable} ${heading.variable} h-full antialiased`}
+      className={`dark ${sans.variable} ${heading.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
         <Providers>{children}</Providers>

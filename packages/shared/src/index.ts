@@ -23,3 +23,14 @@ export const BOOKING_STATUSES = [
   'NO_SHOW',
 ] as const;
 export type BookingStatus = (typeof BOOKING_STATUSES)[number];
+
+// Публічний прайс: GET /api/services
+export interface PublicService {
+  id: string;
+  slug: string;
+  name: string;
+  description: string | null;
+  durationMin: number;
+  priceCents: number;
+  category: string | null;
+}

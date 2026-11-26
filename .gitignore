@@ -11,3 +11,6 @@ coverage/
 .turbo/
 *.tsbuildinfo
 next-env.d.ts
+
+# design references (videos, screenshots)
+design-ref/
